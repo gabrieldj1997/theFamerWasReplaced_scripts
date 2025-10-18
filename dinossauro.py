@@ -1,5 +1,10 @@
 import drone
 
+dic = {
+	"anti": {East: [East, South, West, North], South: [South, West, North, East], West: [West, North, East, South], North: [North, East, South, West]},
+	"horario": {West: [West, South, East, North], North: [North, West, South, East], East: [East, North, West, South], South: [South, East, North, West]}
+}
+
 def criarTerreno():
 	bag = []
 	drone.centralizar()
@@ -25,24 +30,26 @@ def nextSquare(maca, prioridade):
 	atual = (get_pos_x(), get_pos_y())
 	difX = atual[0] - maca[0]
 	difY = atual[1] - maca[1]
-	if difX < 0 and difX != 0:
-		bag.append(East)
-	if difX > 0 and difX != 0:
-		bag.append(West)
-	if difY < 0 and difY != 0:
+	if difY < 0:
 		bag.append(North)
-	if difY > 0 and difY != 0:
+	if difX > 0:
+		bag.append(West)
+	if difY > 0:
 		bag.append(South)
-	
+	if difX < 0:
+		bag.append(East)
 	movesPermitidos = drone.movesPermitidos(atual)
-	
 	if prioridade in bag and prioridade in movesPermitidos and can_move(prioridade):
 		return prioridade
 	
 	for i in bag:
 		if i in movesPermitidos and can_move(i):
 			return i
-	return movesPermitidos[random() * len(movesPermitidos) // 1]
+	sentido = sentido_rotacao(atual, maca)
+	for i in dic[sentido][prioridade]:
+		if i in movesPermitidos and can_move(i):
+			return i
+	
 
 def init():
 	caminho = []
@@ -65,3 +72,80 @@ def init():
 			move(dir)
 			xy = (get_pos_x(), get_pos_y())
 		n_macas = n_macas + 1
+
+def sentido_diagonal_acima(xy1, xy2):
+	y_diagonal = xy1[1] - (-xy1[0] + xy2[0] + xy2[1])
+	if y_diagonal > 0:
+		return "acima"
+	return "baixo"
+
+def sentido_diagonal_baixo(xy1, xy2):
+	y_diagonal = xy1[1] - (xy1[0] - xy2[0] + xy2[1])
+	if y_diagonal > 0:
+		return "acima"
+	return "baixo"
+
+def sentido_rotacao(xyDrone, xyMaca):
+	if xyDrone[0] - xyMaca[0] < 0:
+		sx = '<'
+	else:
+		sx = '>'
+	if xyDrone[0] - xyMaca[0] == 0:
+		sx = '='
+	if xyDrone[1] - xyMaca[1] < 0:
+		sy = '<'
+	else:
+		sy = '>'
+	if xyDrone[1] - xyMaca[1] == 0:
+		sy = '='
+	dir = (xyMaca[0] % 2, xyMaca[1] % 2)
+	if dir == (1,0) or dir == (0,1):
+		dir2 = sentido_diagonal_baixo(xyDrone,xyMaca)
+	if dir == (1,1) or dir == (0,0):
+		dir2 = sentido_diagonal_acima(xyDrone,xyMaca)
+	mapa = {
+	(1, 0): {  
+	('<','>', 'acima'): 'horario',
+	('=','>', 'acima'): 'horario',
+	('>','>', 'acima'): 'horario',
+	('>','>', 'baixo'): 'anti',
+	('>','=', 'baixo'): 'anti',
+	('>','<', 'baixo'): 'anti',
+	('>','<', 'baixo'): 'anti',
+	('<','<', 'baixo'): 'horario',
+	('<','<', 'cima'): 'anti'
+	},
+	(0, 0): {
+	('<','>', 'baixo'): 'horario',
+	('<','>', 'acima'): 'anti',
+	('>','>', 'acima'): 'horario',
+	('>','=', 'acima'): 'horario',
+	('>','<', 'acima'): 'horario',
+	('>','<', 'baixo'): 'anti',
+	('=','<', 'baixo'): 'anti',
+	('<','<', 'baixo'): 'anti'
+	},
+	(1, 1): {
+	('<','>', 'baixo'): 'anti',
+	('<','>', 'acima'): 'horario',
+	('=','>', 'acima'): 'horario',
+	('>','>', 'acima'): 'horario',
+	('>','<', 'acima'): 'anti',
+	('>','<', 'baixo'): 'horario',
+	('<','<', 'baixo'): 'anti',
+	('<','=', 'baixo'): 'anti'
+	},
+	(0, 1): {
+	('<','>', 'acima'): 'horario',
+	('>','>', 'acima'): 'anti',
+	('>','>', 'baixo'): 'horario',
+	('>','<', 'baixo'): 'anti',
+	('=','<', 'baixo'): 'anti',
+	('<','<', 'baixo'): 'anti',
+	('<','<', 'acima'): 'horario',
+	('<','=', 'acima'): 'horario'
+	}
+	}
+	return mapa[dir][(sx, sy, dir2)]
+
+init()
