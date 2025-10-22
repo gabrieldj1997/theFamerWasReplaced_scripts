@@ -1,20 +1,29 @@
 import drone
 import plantacao
-multiplicador = 1000000000
+def test():
+	drone.centralizar()
+	start()
+	return True
 def init(number):
 	drone.centralizar()
-	while num_items(Items.Pumpkin) < (number * multiplicador):
+	n = num_items(Items.Pumpkin)
+	num_abobora = num_items(Items.Pumpkin)
+	while num_items(Items.Pumpkin) < num_abobora + (number * plantacao.multiplicador):
 		start()
+	return True
 def start():
 	bagDrones = []
 	def verificar():
-		for y in range(get_world_size()):
-			while not can_harvest() or get_entity_type() == Entities.Dead_Pumpkin:
-				if get_entity_type() == Entities.Dead_Pumpkin:
-					plantacao.plantar(Entities.Pumpkin)
-				continue
-			move(North)
-		return True
+		while True:
+			control = True
+			for y in range(get_world_size()):
+				if not can_harvest() or get_entity_type() == Entities.Dead_Pumpkin:
+					if get_entity_type() == Entities.Dead_Pumpkin:
+						plantacao.plantar(Entities.Pumpkin)
+					control = False
+				move(North)
+			if control:
+				return True
 	def plantar():
 		for y in range(get_world_size()):
 			plantacao.plantar(Entities.Pumpkin)		

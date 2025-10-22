@@ -2,17 +2,22 @@ import drone
 fertilizar = False
 multiplicador = 1000000000
 def plantar(type):
-	if arar(type) and get_ground_type() == Grounds.Grassland:
+	if get_ground_type() == Grounds.Grassland:
 		till()
-	if num_items(Items.Water) > 0 and get_water() < 0.5:
+	if num_items(Items.Water) > max_drones() and get_water() < 0.7:
 		use_item(Items.Water)
 	if can_harvest():
 		harvest()
 	plant(type)
-	if num_items(Items.Fertilizer) > 0 and fertilizar:
+	if num_items(Items.Fertilizer) > max_drones() and fertilizar:
 		use_item(Items.Fertilizer)
-def arar(type):
-	dic=[Entities.Bush, Entities.Grass, Entities.Tree]
-	if type in dic:
-		return False
-	return True
+def plantarMundo(type):
+	def col():
+		for _ in range(get_world_size()):
+			plantar(type)
+			if get_pos_y() != get_world_size():
+				move(North)
+	for _ in range(get_world_size()):
+		if not spawn_drone(col):
+			col()
+		move(East)

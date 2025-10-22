@@ -1,6 +1,5 @@
 import plantacao
 import drone
-multiplicador = 1000000000
 def plantar():
 	bag = []
 	def row():
@@ -72,8 +71,10 @@ def organizar():
 			wait_for(x)
 			
 def init(number):
-	while num_items(Items.Cactus) < (number * multiplicador):
+	n = num_items(Items.Cactus)
+	while num_items(Items.Cactus) < (number * plantacao.multiplicador):
 		drone.centralizar()
 		plantar()
 		organizar()
 		harvest()
+	return True
