@@ -1,11 +1,10 @@
 import drone
 import plantacao
-
-def init():
-	while True:
+multiplicador = 1000000000
+def init(number):
+	drone.centralizar()
+	while num_items(Items.Pumpkin) < (number * multiplicador):
 		start()
-				
-
 def start():
 	bagDrones = []
 	def verificar():

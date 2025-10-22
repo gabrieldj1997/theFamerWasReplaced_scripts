@@ -1,18 +1,16 @@
+import drone
 import plantacao
-
-def init():
-	colher()
-	
-def colher():
+def init(number):
+	drone.centralizar()
+	colher(number * plantacao.multiplicador)
+def colher(number):
 	def row():
-		while True:
-			while not can_harvest():
-				continue
+		while num_items(Items.Carrot) < number:
+			if get_entity_type() == None:
+				plantacao.plantar(Entities.Carrot)	
 			if can_harvest():
-				harvest()
 				plantacao.plantar(Entities.Carrot)				
 			move(North)
-	
 	for x in range(get_world_size()):
 		if not spawn_drone(row):
 			row()

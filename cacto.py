@@ -1,6 +1,6 @@
 import plantacao
 import drone
-
+multiplicador = 1000000000
 def plantar():
 	bag = []
 	def row():
@@ -18,79 +18,62 @@ def plantar():
 	for i in bag:
 		while not wait_for(i):
 			continue
-			
-def trocar():
+def trocar(cord):
 	control = True
 	center = measure()
-	right = measure(East)
-	up = measure(North)
-	down = measure(South)
-	left = measure(West)
-							
-	if get_pos_y() != get_world_size()-1:
-		if center > up:
-			swap(North)
-			control = False
-									
-	if get_pos_x() != get_world_size()-1:
-		if center > right:
-			swap(East)
-			control = False
-					
-	if get_pos_y() != 0:
-		if center < down:
-			swap(South)
-			control = False
-									
-	if get_pos_x() != 0:
-		if center < left:
-			swap(West)
-			control = False
-
+	if cord == North:
+		up = measure(North)
+		down = measure(South)	
+		if get_pos_y() != get_world_size()-1:
+			if center > up:
+				swap(North)
+				control = False	
+		if get_pos_y() != 0:
+			if center < down:
+				swap(South)
+				control = False
+	if cord == East:
+		left = measure(West)
+		right = measure(East)	
+		if get_pos_x() != get_world_size()-1:
+			if center > right:
+				swap(East)
+				control = False	
+		if get_pos_x() != 0:
+			if center < left:
+				swap(West)
+				control = False
 	if not control:
-		trocar()
+		trocar(cord)
 	return control
-		
 def organizar():
-	def row():
-		n = 0
-		while True:
-			control = True
-			for i in range(get_world_size()):
-				c = trocar()
+	for i in [(North, East), (East, North)]:
+		drone.centralizar()
+		def row():
+			while True:
+				control = True
+				for _ in range(get_world_size()):
+					c = trocar(i[1])
+					if control:
+						control = c
+					move(i[1])
 				if control:
-					control = c
-				move(North)
-			
-			if control:
-				if n > 0:
-					control = False
-				return [True, control]
-			n = n + 1
-
-	while True:
-		control = True
+					return True
 		drone.centralizar()
 		bag = []
-		for i in range(2):
-			for x in range(get_world_size()):
-				while num_drones() >= ((get_world_size() + 1) // 2) + 1:
-					continue
-				if x % 2 == i:
-					bag.append(spawn_drone(row))
-				move(East)
-			for i in bag:
-				while not wait_for(i)[0]:
-					continue
-				if control:
-					control = wait_for(i)[1]
-			if control:
-				return True
-
-		
-
-def init():
-	while True:
+		for x in range(get_world_size()):
+			d = spawn_drone(row)
+			if d != None:
+				bag.append(d)
+				move(i[0])
+			else:
+				row()
+		for x in bag:
+			wait_for(x)
+			
+def init(number):
+	while num_items(Items.Cactus) < (number * multiplicador):
+		drone.centralizar()
 		plantar()
 		organizar()
 		harvest()

@@ -8,7 +8,5 @@ import girassol
 import cacto
 import labirinto
 import dinossauro
-clear()
-set_world_size(4)
-while True:
-	dinossauro.init()
+
+grama.init(10)

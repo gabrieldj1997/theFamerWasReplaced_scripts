@@ -20,8 +20,7 @@ def construir():
 	for i in bag:
 		while not wait_for(i):
 			continue
-	substance = get_world_size() * 2**(num_unlocked(Unlocks.Mazes) - 1)
-	use_item(Items.Weird_Substance, substance)
+	use_item(Items.Weird_Substance, get_world_size() * get_world_size())
 
 def vizinhos(xy):
 	moves = []
@@ -40,9 +39,10 @@ def vizinhos(xy):
 	return moves
 
 def resolve():
-	inicio = (get_pos_x(), get_pos_y())
-	final = measure()
-	bfs(inicio, final)
+	for i in range(300):
+		inicio = (get_pos_x(), get_pos_y())
+		final = measure()
+		bfs(inicio, final)
 
 def getId(xy):
 	return xy[1] * get_world_size() + xy[0]
@@ -55,9 +55,8 @@ def bfs(inicio, final):
 		while not control:
 			atual = (get_pos_x(), get_pos_y())
 			if atual == final:
-				harvest()
-				clear()
-				init()
+				use_item(Items.Weird_Substance, get_world_size() * get_world_size())
+				return True
 			v = vizinhos(atual)
 			if not getId(atual) in visitados:
 				visitados.append(getId(atual))
@@ -79,8 +78,7 @@ def bfs(inicio, final):
 
 	atual = (get_pos_x(), get_pos_y())
 	if atual == final:
-		harvest()
-		clear()
+		use_item(Items.Weird_Substance, get_world_size() * get_world_size())
 		return True
 	visitados.append(getId(atual))
 	for vizinho in vizinhos(atual):
@@ -89,3 +87,6 @@ def bfs(inicio, final):
 		move(vizinho["next"])
 		bag.append(spawn_drone(drone))
 		move(dic[vizinho["next"]])
+	for i in bag:
+		while not wait_for(bag):
+			continue

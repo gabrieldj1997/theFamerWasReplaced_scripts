@@ -1,0 +1,2 @@
+import labirinto
+labirinto.resolve()

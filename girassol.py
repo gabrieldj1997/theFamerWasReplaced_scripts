@@ -1,9 +1,11 @@
 import drone
 import plantacao
-			
-def colher():
+def init(number):
+	drone.centralizar()
+	colher(number * plantacao.multiplicador)
+def colher(number):
 	def row():
-		while True:
+		while num_items(Items.Power) < number:
 			harvest()
 			plantacao.plantar(Entities.Sunflower)
 			move(North)
@@ -11,7 +13,4 @@ def colher():
 		if not spawn_drone(row):
 			row()
 		move(East)
-def init():
-	drone.centralizar()
-	colher()
 		

@@ -1,5 +1,4 @@
 dic = [North,East,South,West]
-
 def movesPermitidos(xy):
 	moves = []
 	if xy[0] % 2 == 0:
@@ -15,41 +14,44 @@ def movesPermitidos(xy):
 		if xy[0] != 0:
 			moves.append(West)
 	return moves
-	
-	
 def centralizar():
-	x = get_pos_x()
-	y = get_pos_y()
-	for i in range(x):
-		move(West)
-	for i in range(y):
-		move(South)
+	while get_pos_x() != 0:
+		if get_pos_x() > get_world_size() // 2:
+			move(East)
+		else:
+			move(West)
+	while get_pos_y() != 0:
+		if get_pos_y() > get_world_size() // 2:
+			move(North)
+		else:
+			move(South)
 def possivel():
 	if not can_move(North) and not can_move(South):
 		if not can_move(East) and not can_move(West):
 			return False
 	return True
-
 def mover(x, y):
-	while get_pos_x() != x or get_pos_y() != y: 
-		difX = abs(get_pos_x() - x)
-		difY = abs(get_pos_y() - y)
-
-		for i in range(difX):
-			if not possivel():
-				return False
-			if(get_pos_x() < x):
-				if not move(East):
-					move(dic[random()*len(dic)//1])
+	while get_pos_x() != x:
+		dx = get_pos_x() - x
+		if dx < 0:
+			if abs(dx) <= get_world_size() // 2:
+				move(East)
 			else:
-				if not move(West):
-					move(dic[random()*len(dic)//1])
-		for i in range(difY):
-			if not possivel():
-				return False
-			if(get_pos_y() < y):
-				if not move(North):
-					move(dic[random()*len(dic)//1])
+				move(West)
+		else:
+			if abs(dx) <= get_world_size() // 2:
+				move(West)
 			else:
-				if not move(South):
-					move(dic[random()*len(dic)//1])
+				move(East)
+	while get_pos_y() != y:
+		dy = get_pos_y() - y
+		if dy < 0:
+			if abs(dy) <= get_world_size() // 2:
+				move(North)
+			else:
+				move(South)
+		else:
+			if abs(dy) <= get_world_size() // 2:
+				move(South)
+			else:
+				move(North)
