@@ -9,4 +9,4 @@ import cacto
 import labirinto
 import dinossauro
 
-grama.init(10)
+abobora.init(10)

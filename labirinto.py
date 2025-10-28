@@ -1,92 +1,67 @@
-dic = {North:South, South:North, East:West, West:East}
+import drone
+import moduloLab
+
+multi = 1000000
 
 def init():
+	clear()
+	inicial = num_items(Items.Gold)
+	nescessario = inicial + (2 * multi)
+	repeticoes = 0
+	while inicial < nescessario:
+		drone.centralizar()
 		construir()
-		resolve()
+		repeticoes += pegarTesouro(inicial, nescessario)
+		inicial = num_items(Items.Gold)
+	return repeticoes
 
 def construir():
 	clear()
-	bag = []
-	def row():
-		for y in range(get_world_size()):
-			plant(Entities.Bush)
-			move(North)
-		return True
-	for x in range(get_world_size()):
-		while num_drones() >= max_drones():
-			continue
-		bag.append(spawn_drone(row))
-		move(East)
-	for i in bag:
-		while not wait_for(i):
-			continue
-	use_item(Items.Weird_Substance, get_world_size() * get_world_size())
+	plant(Entities.Bush)
+	substance = get_world_size() * 2**(num_unlocked(Unlocks.Mazes) - 1)
+	use_item(Items.Weird_Substance, substance)
 
-def vizinhos(xy):
-	moves = []
-	if can_move(East):
-		nextId = getId((xy[0]+1,xy[1]))
-		moves.append({"id": nextId, "next": East})
-	if can_move(West):
-		nextId = getId((xy[0]-1,xy[1]))
-		moves.append({"id": nextId, "next": West})
-	if can_move(North):
-		nextId = getId((xy[0],xy[1]+1))
-		moves.append({"id": nextId, "next": North})
-	if can_move(South):
-		nextId = getId((xy[0],xy[1]-1))
-		moves.append({"id": nextId, "next": South})
-	return moves
+def pegarTesouro(inicial, nescessario):
+	valorTesouro = (get_world_size() * get_world_size()) * 32
+	moduloLab.matriz = {}
+	mapa = moduloLab.criarMapa()
+	q = 1
+	while True:
+		c = calcularCaminho(mapa, (moduloLab.getPos()), measure())
+		while c:
+			next = c.pop(len(c)-1)
+			if next != moduloLab.getPos():
+				drone.mover(next[0],next[1])
+				v = moduloLab.vizinhos(moduloLab.getPos())
+				if mapa[moduloLab.getPos()] != v:
+					mapa[moduloLab.getPos()] = v
+		substance = get_world_size() * 2**(num_unlocked(Unlocks.Mazes) - 1)
+		if q >= 300 or nescessario < inicial + (valorTesouro * q):
+			harvest()
+			return q
+		else:
+			use_item(Items.Weird_Substance, substance)
+			q += 1
 
-def resolve():
-	for i in range(300):
-		inicio = (get_pos_x(), get_pos_y())
-		final = measure()
-		bfs(inicio, final)
 
-def getId(xy):
-	return xy[1] * get_world_size() + xy[0]
-
-def bfs(inicio, final):
-	visitados = []
-	bag = []
-	def drone():
-		control = False
-		while not control:
-			atual = (get_pos_x(), get_pos_y())
-			if atual == final:
-				use_item(Items.Weird_Substance, get_world_size() * get_world_size())
-				return True
-			v = vizinhos(atual)
-			if not getId(atual) in visitados:
-				visitados.append(getId(atual))
-				if len(visitados) > 10:
-					visitados.pop(0)
-			n = len(v)
-			for i in range(n):
-				if n == 1:
-					control = True
-				if n == 2 and v[i]["id"] not in visitados:
-					move(v[i]["next"])
-				if n >= 3:
-					if v[i]["id"] not in visitados:
-						move(v[i]["next"])
-						bag.append(spawn_drone(drone))
-						move(dic[v[i]["next"]])
-						control = True
-		return [True, bag]
-
-	atual = (get_pos_x(), get_pos_y())
-	if atual == final:
-		use_item(Items.Weird_Substance, get_world_size() * get_world_size())
-		return True
-	visitados.append(getId(atual))
-	for vizinho in vizinhos(atual):
-		while num_drones() >= max_drones():
-			continue
-		move(vizinho["next"])
-		bag.append(spawn_drone(drone))
-		move(dic[vizinho["next"]])
-	for i in bag:
-		while not wait_for(bag):
-			continue
+def calcularCaminho(mapa, inicio, fim):
+	fila = [inicio]
+	visitado = set([inicio])
+	anterior = {inicio: None}
+	while fila:
+		atual = fila.pop(0)
+		if atual == fim:
+			break
+		for conexao in mapa[atual]:
+			prox = conexao['square']
+			if prox not in visitado:
+				visitado.add(prox)
+				anterior[prox] = atual
+				fila.append(prox)
+	caminho = []
+	if fim in anterior:
+		atual = fim
+		while not atual == None:
+			caminho.append(atual)
+			atual = anterior[atual]
+	return caminho

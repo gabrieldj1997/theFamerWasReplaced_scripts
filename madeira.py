@@ -20,3 +20,4 @@ def plantar(x, y):
 		plantacao.plantar(Entities.Tree)
 	else:
 		plantacao.plantar(Entities.Bush)
+init(20)

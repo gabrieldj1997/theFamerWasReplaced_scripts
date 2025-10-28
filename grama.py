@@ -15,3 +15,4 @@ def colher(number):
 		if not spawn_drone(row):
 			row()
 		move(East)
+init(10)

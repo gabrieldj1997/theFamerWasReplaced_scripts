@@ -49,7 +49,6 @@ def nextSquare(maca, prioridade):
 
 
 def init():
-	
 	caminho = []
 	clear()
 	plantacao.ararTerra()
@@ -109,4 +108,4 @@ def init2():
 	quick_print("passos init2:")
 	quick_print(passos)
 
-
+init()

@@ -1,15 +1,12 @@
 import drone
 import plantacao
-def test():
-	drone.centralizar()
-	start()
-	return True
 def init(number):
 	drone.centralizar()
 	n = num_items(Items.Pumpkin)
 	num_abobora = num_items(Items.Pumpkin)
 	while num_items(Items.Pumpkin) < num_abobora + (number * plantacao.multiplicador):
 		start()
+		harvest()
 	return True
 def start():
 	bagDrones = []
