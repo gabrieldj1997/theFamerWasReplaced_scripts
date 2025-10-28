@@ -1,2 +1,2 @@
-import labirinto
-labirinto.init()
+import labirinto2
+labirinto2.init()
