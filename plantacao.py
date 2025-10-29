@@ -11,6 +11,16 @@ def plantar(type):
 	plant(type)
 	if num_items(Items.Fertilizer) > max_drones() and fertilizar:
 		use_item(Items.Fertilizer)
+def ararTerra():
+	def row():
+		for _ in range(get_world_size()):
+			if get_ground_type() == Grounds.Grassland:
+				till()
+			move(North)
+	for _ in range(get_world_size()):
+		if not spawn_drone(row):
+			row()
+		move(East)
 def plantarMundo(type):
 	def col():
 		for _ in range(get_world_size()):
